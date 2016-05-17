@@ -11,9 +11,15 @@ var task = function(request, callback){
 	//1. load configuration
 	var awsConfig = helpers.readJSONFile(AWS_CONFIG_FILE);
 	var policyData = helpers.readJSONFile(POLICY_FILE);
+	
+	
+	
 
 	//2. prepare policy
 	var policy = new Policy(policyData);
+	policy.generateEncodedPolicyDocument();
+	policyData.conditions.push({"x-amz-meta-ip":request.ip});
+ 	policyData.conditions.push({"x-amz-meta-names":"tracz.lukasz"});
 	
 
 	//3. generate form fields for S3 POST
