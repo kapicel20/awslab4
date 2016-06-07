@@ -1,35 +1,39 @@
 var AWS = require("aws-sdk");
 var helpers = require("../helpers");
+var simpleDb = require("./simpleDb");
+AWS.config.loadFromPath('./config.json');
+
+var task = function(request, callback){
+	var params = {
+  Bucket: request.query.bucket,
+  Key: request.query.key
+};
+			
 
 AWS.config.loadFromPath('./config.json');
 
-var task =  function(request, callback){
-
-	var bucket = request.query["bucket"];
- 	var key = request.query["key"];
-	callback(null, "Dodano do bucket: " + bucket + " " + "za pomoca klucza: " + key);
-}
-
-var s3 = new AWS.S3();
-var params = {Bucket: bucket, Key: key};
+var s3 = new AWS.S3(); 
 
 s3.getObject(params, function(err, data) {
-  if (err) console.log(err, err.stack); // an error occurred
-  else     console.log(data);           // successful response
+	var algorithms = ['md5','sha1','sha256', 'sha512'];
+	var loopCount = 1;
+	var doc = data.Body;
+	
 
-  var algorithms = request.body.alg ? Object.keys(request.body.alg) : [];
-	var loopCount = request.body.loop ? request.body.loop : 1;
-	var doc = request.body.txt ? request.body.txt : "";
-  
-  helpers.calculateMultiDigest(doc, 
+	helpers.calculateMultiDigest(doc, 
 		algorithms, 
 		function(err, digests) {
-			callback(null, digests.join("<br>") + ("<hr>  <br>Service provided by: " + os.hostname()));	
+			callback(null, digests.join("<br>"));				
+		  var AttributesPut = [ ];
+					for(var i; i < algorithms.length; i){
+						AttributesPut.push({Name:algorithms[i], Value:digest[i]});
+					}
+					simpleDb.putAttributes('Pliki', AttributesPut, function(){
+					simpleDb.getFromDb('Pliki');				   	 
+					});
 		}, 
-		loopCount);
-  
-  
-  });
-
+		loopCount);   // successful response
+});
+}
 
 exports.action = task

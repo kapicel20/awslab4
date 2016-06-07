@@ -3,6 +3,7 @@
 	{"path":"/","action":"createform"},	
 	{"path":"/action","action":"action"},
 	{"path":"/digest","action":"digest"},
-	{"path":"/s3digest","action":"s3digest"}
+	{"path":"/s3digest","action":"s3digest"},
+	{"path":"/simpleDb","action":"simpleDb"}
 	
 ]
